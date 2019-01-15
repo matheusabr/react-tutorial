@@ -11,36 +11,32 @@ function Square(props) {
   );
 }
 
-// Class component - Square
-// class Square extends React.Component {
-//   render() {
-//     return (
-//       <button
-//         className="square"
-//         onClick={() => this.props.onClick()}
-//       >
-//         {this.props.value}
-//       </button>
-//     );
-//   }
-// }
-
+// Class component
 class Board extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       // Initialize square state with null to all
       squares: Array(9).fill(null),
+      xIsNext: true,
     };
   }
 
   handleClick(i) {
     // A copy of squares array
     const squares = this.state.squares.slice();
-    // Set X to button clicked
-    squares[i] = 'X';
+    // Ignore if it has a winner
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
+    // Set X or O to button clicked
+    // Ternary operator
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
     // Update local (board) state
-    this.setState({ squares: squares });
+    this.setState({ 
+      squares: squares,
+      xIsNext: !this.state.xIsNext, 
+    });
   }
 
   renderSquare(i) {
@@ -53,8 +49,13 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: X';
-
+    const winner = calculateWinner(this.state.squares);
+    let status;
+    if (winner) {
+      status = 'Winner: ' + winner;
+    } else {
+      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    }
     return (
       <div>
         <div className="status">{status}</div>
@@ -78,6 +79,7 @@ class Board extends React.Component {
   }
 }
 
+// Class component
 class Game extends React.Component {
   render() {
     return (
@@ -94,6 +96,27 @@ class Game extends React.Component {
   }
 }
 
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
+
+// React DOM handler
 ReactDOM.render(
   <Game />,
   document.getElementById('root')
