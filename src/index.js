@@ -5,7 +5,10 @@ import './index.css';
 class Square extends React.Component {
     render() {
       return (
-        <button className="square">
+        <button
+          className="square"
+          onClick={() => this.props.onClick()}
+        >
           {this.props.value}
         </button>
       );
@@ -13,8 +16,30 @@ class Square extends React.Component {
   }
   
   class Board extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        // Initialize square state with null to all
+        squares: Array(9).fill(null),
+      };
+    }
+
+    handleClick(i) {
+      // A copy of squares array
+      const squares = this.state.squares.slice();
+      // Set X to button clicked
+      squares[i] = 'X';
+      // Update local (board) state
+      this.setState({squares: squares});
+    }
+
     renderSquare(i) {
-      return <Square value={i} />;
+      return (
+        <Square 
+          value={this.state.squares[i]}
+          onClick={() => this.handleClick(i)}
+        />
+      );
     }
   
     render() {
